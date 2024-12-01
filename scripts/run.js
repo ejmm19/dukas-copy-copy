@@ -25,16 +25,20 @@ const instruments = [
 ];
 
 
+// Año dinámico (puedes cambiar este valor para procesar otro año)
+const year = 2014;
+
 const type = 'tick';
 const format = 'csv';
 const downloadDir = 'download'; // Directorio de descarga
 const s3BucketPath = 's3://market-replay/dukascopy/forexv2/'; // Ruta S3
 
+// Generar trimestres dinámicamente para el año
 const quarters = [
-    { fromDate: '2014-01-01', toDate: '2014-03-31', name: 'Q1' },
-    { fromDate: '2014-04-01', toDate: '2014-06-30', name: 'Q2' },
-    { fromDate: '2014-07-01', toDate: '2014-09-30', name: 'Q3' },
-    { fromDate: '2014-10-01', toDate: '2014-12-31', name: 'Q4' }
+    { fromDate: `${year}-01-01`, toDate: `${year}-03-31`, name: 'Q1' },
+    { fromDate: `${year}-04-01`, toDate: `${year}-06-30`, name: 'Q2' },
+    { fromDate: `${year}-07-01`, toDate: `${year}-09-30`, name: 'Q3' },
+    { fromDate: `${year}-10-01`, toDate: `${year}-12-31`, name: 'Q4' }
 ];
 
 // Ejecutar un comando en el shell de forma asíncrona
