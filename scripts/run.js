@@ -24,8 +24,7 @@ const instruments = [
     'xagusd', 'xauusd'
 ];
 
-
-// Año dinámico (puedes cambiar este valor para procesar otro año)
+// Año dinámico
 const year = 2014;
 
 const type = 'tick';
@@ -54,6 +53,20 @@ function execCommand(command) {
             else reject(new Error(`Error en comando: ${command}. Código: ${code}`));
         });
     });
+}
+
+// Verificar si un archivo existe en S3
+async function fileExistsInS3(instrument, fileName) {
+    const s3Path = `${s3BucketPath}${instrument}/${fileName}`;
+    const command = `aws s3 ls ${s3Path}`;
+    try {
+        await execCommand(command);
+        console.log(`Archivo encontrado en S3: ${s3Path}`);
+        return true;
+    } catch {
+        console.log(`Archivo no encontrado en S3: ${s3Path}`);
+        return false;
+    }
 }
 
 // Procesar un archivo CSV para agregar la columna "symbol"
@@ -113,6 +126,14 @@ async function processQuarter(instrument, quarter) {
     const { fromDate, toDate } = quarter;
     const fileName = `${instrument}-${type}-${fromDate.replace(/-/g, '-')}-${toDate.replace(/-/g, '-')}.${format}`;
     const filePath = `${downloadDir}/${fileName}`;
+
+    // Verificar si el archivo ya existe en S3
+    const existsInS3 = await fileExistsInS3(instrument, fileName);
+    if (existsInS3) {
+        console.log(`Archivo ya existe en S3: ${fileName}. Omitiendo descarga.`);
+        return;
+    }
+
     const command = `npx dukascopy-node -i ${instrument} -from ${fromDate} -to ${toDate} -t ${type} -f ${format} --volumes --flats --cache`;
 
     console.log(`Descargando datos para ${instrument} (${quarter.name})...`);

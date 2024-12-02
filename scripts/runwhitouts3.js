@@ -130,6 +130,13 @@ async function processMonth(instrument, month) {
     const { fromDate, toDate } = month;
     const fileName = `${instrument}-${type}-${fromDate.replace(/-/g, '-')}-${toDate.replace(/-/g, '-')}.${format}`;
     const filePath = `${downloadDir}/${fileName}`;
+
+    // Validar si el archivo ya existe
+    if (fs.existsSync(filePath) && fs.statSync(filePath).size > 0) {
+        console.log(`Archivo ya existe y no está vacío: ${filePath}. Omitiendo descarga.`);
+        return; // Salir de la función si el archivo ya está descargado
+    }
+
     const command = `npx dukascopy-node -i ${instrument} -from ${fromDate} -to ${toDate} -t ${type} -f ${format} --volumes --flats --cache`;
 
     console.log(`Descargando datos para ${instrument} (${month.name})...`);
